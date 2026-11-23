@@ -42,6 +42,25 @@ var MIN_WAGE = {
   2027: { hour: 10700, rate: 3.7 }
 };
 
+/* 최저임금 문제: 출제 시점의 연도에 맞춰 바뀜 (표에 없는 해는 가장 최근 연도) */
+function minWageQuiz(now) {
+  var y = now.getFullYear();
+  if (!MIN_WAGE[y]) {
+    var maxY = 0;
+    for (var k in MIN_WAGE) { if (Number(k) > maxY) maxY = Number(k); }
+    y = maxY;
+  }
+  var w = MIN_WAGE[y];
+  var prev = MIN_WAGE[y - 1];
+  return {
+    a: [w.hour],
+    q: y + "년 최저임금은 시간급 얼마일까요? (원 단위)",
+    ok: y + "년 최저임금은 시간급 " + comma(w.hour) + "원(월 209시간 기준 " + comma(w.hour * 209) + "원)이다.",
+    exp: prev ? (y - 1) + "년 " + comma(prev.hour) + "원보다 " + w.rate + "% 올랐습니다." : "",
+    law: "[최저임금법 제10조, " + y + "년 적용 최저임금 고시]"
+  };
+}
+
 /* =========================================================
  * 문제 은행
  *  type  num : 숫자 답 (a 중 하나 포함 시 정답, alt 문자열도 인정)
@@ -97,21 +116,7 @@ var QUIZ = [
     law: "[근로기준법 제56조제2항]" },
   { id: 8, cat: "임금", lv: "쉬움", type: "num", a: [10320],
     q: "", hint: "1만 원을 넘었어요", ok: "", exp: "", law: "",
-    // 출제 시점의 연도에 맞춰 문제가 바뀜 (MIN_WAGE 표에 없는 해는 가장 최근 연도로 출제)
-    dyn: function (now) {
-      var y = now.getFullYear(), ys = [];
-      for (var k in MIN_WAGE) ys.push(Number(k));
-      ys.sort(function (a, b) { return a - b; });
-      if (!MIN_WAGE[y]) y = ys[ys.length - 1];
-      var w = MIN_WAGE[y];
-      return {
-        a: [w.hour],
-        q: y + "년 최저임금은 시간급 얼마일까요? (원 단위)",
-        ok: y + "년 최저임금은 시간급 " + comma(w.hour) + "원(월 209시간 기준 " + comma(w.hour * 209) + "원)이다.",
-        exp: (MIN_WAGE[y - 1] ? (y - 1) + "년 " + comma(MIN_WAGE[y - 1].hour) + "원보다 " + w.rate + "% 올랐습니다." : ""),
-        law: "[최저임금법 제10조, " + y + "년 적용 최저임금 고시]"
-      };
-    } },
+    dyn: minWageQuiz },
   { id: 9, cat: "임금", lv: "보통", type: "num", a: [10],
     q: "1년 이상 근로계약을 맺은 수습근로자(3개월 이내)는 최저임금의 몇 %까지 감액할 수 있을까요?",
     hint: "90%는 줘야 해요",
