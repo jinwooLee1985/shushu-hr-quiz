@@ -608,7 +608,11 @@ function command(room, text, sender, replier) {
   } else if (cmd === "/내점수") {
     var s = loadJSON(DB.SCORE + room, {});
     replier.reply(sender + "님 점수: " + (s[sender] || 0) + "점");
+  } else if (cmd === "/내닉네임") {        // 관리자 등록용: 봇이 인식한 닉네임 그대로 표시
+    replier.reply("봇이 인식한 닉네임:\n[" + sender + "]\n(대괄호 안 글자를 그대로 CONFIG.ADMINS에 넣으세요)");
   } else if (!isAdmin(sender)) {
+    var ADMIN_CMDS = ["/퀴즈등록", "/퀴즈해제", "/퀴즈출제", "/정답공개", "/퀴즈상태", "/퀴즈점수초기화", "/퀴즈새로고침", "/퀴즈기록저장"];
+    if (ADMIN_CMDS.indexOf(cmd) !== -1) replier.reply("⚠️ 관리자만 쓸 수 있는 명령어예요.\n인식된 닉네임: [" + sender + "]");
     return;
   } else if (cmd === "/퀴즈등록") {
     if (quizRooms.indexOf(room) === -1) { quizRooms.push(room); saveJSON(DB.ROOMS, quizRooms); }
